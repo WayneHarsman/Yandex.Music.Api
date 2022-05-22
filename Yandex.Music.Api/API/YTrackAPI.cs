@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -177,6 +178,47 @@ namespace Yandex.Music.Api.API
 
         #region Получение данных трека
 
+        
+        /// <summary>
+        /// Получение потока трека
+        /// </summary>
+        /// <param name="storage">Хранилище</param>
+        /// <param name="trackKey">Ключ трека в формате {идентификатор трека:идентификатор альбома}</param>
+        /// <returns>Поток скачивания трека</returns>
+        public Stream GetTrackStream(AuthStorage storage, string trackKey)
+        {
+            string fileLink = GetFileLink(storage, trackKey);
+            
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    return client.OpenRead(fileLink);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Получение потока трека
+        /// </summary>
+        /// <param name="storage">Хранилище</param>
+        /// <param name="track">Трек</param>
+        /// <returns>Поток скачивания трека</returns>
+        public Stream GetTrackStream(AuthStorage storage, YTrack track)
+        {
+            string fileLink = GetFileLink(storage, track.GetKey().ToString());
+
+            return GetTrackStream(storage, fileLink);
+        }
+        
+        
         /// <summary>
         /// Выгрузка в файл
         /// </summary>
@@ -196,6 +238,7 @@ namespace Yandex.Music.Api.API
                 Console.WriteLine(ex.ToString());
             }
         }
+        
 
         /// <summary>
         /// Выгрузка в файл
